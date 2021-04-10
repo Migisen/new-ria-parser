@@ -41,3 +41,5 @@ for i in range(10):
     formated_day = news_day.strftime('%Y%m%d')
 
 print(news_list)
+
+print("Arigato")
