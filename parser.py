@@ -41,10 +41,12 @@ def simple_parser(url, iteration):
             article_url = article_href.get('href')
             article_date = article_block.find(class_="list-item__date")
             article_time = article_date.text
-            article_date = news_day.strftime('%Y%m%d') + " " + article_time[-5:]#извлекаем время
-            article_tags = article_block.find("a", class_="list-tag__text")
-            article_tag = article_tags.text  # теги
-            # artical_text
+            article_date = news_day.strftime('%Y%m%d') + " " + article_time[-5:]  # извлекаем время
+            article_tags = article_block.find_all("a", class_="list-tag__text")
+            article_tag = []
+            for article_tag_block in article_tags:
+                article_tag.append(article_tag_block.text)
+
             news_list.append({'title': article_title, 'url': article_url, "tags": article_tag, "date": article_date})
         print(news_list)
         news_day = news_day - one_day
