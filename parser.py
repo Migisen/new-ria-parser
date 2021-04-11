@@ -47,7 +47,16 @@ def simple_parser(url, iteration):
             for article_tag_block in article_tags:
                 article_tag.append(article_tag_block.text)
 
-            news_list.append({'title': article_title, 'url': article_url, "tags": article_tag, "date": article_date})
+            result = requests.get(article_url)
+            page_text = result.text
+            page_soup = bs(page_text, features='lxml')
+            article_text_blocks = page_soup.find_all("div", class_="article__text")
+            article_text = str()
+            for article_text_block in article_text_blocks:
+                article_text += article_text_block.text + ""
+
+            news_list.append({'title': article_title, 'url': article_url, "tags": article_tag, "date": article_date,
+                              "text": article_text})
         print(news_list)
         news_day = news_day - one_day
         formated_day = news_day.strftime('%Y%m%d')
@@ -55,4 +64,4 @@ def simple_parser(url, iteration):
     return news_list
 
 
-simple_parser('https://ria.ru/economy/', 5)
+simple_parser('https://ria.ru/economy/', 10)
