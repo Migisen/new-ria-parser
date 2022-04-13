@@ -81,6 +81,8 @@ class RiaParser:
             'text': article_text
         }
 
+        print(f'{information["title"]} | {information["date"]}')
+
         return information
 
     @staticmethod
