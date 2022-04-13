@@ -1,6 +1,6 @@
-from audioop import mul
 import sqlite3
 import multiprocessing
+import os
 
 from bs4 import BeautifulSoup as bs
 import requests
@@ -8,6 +8,7 @@ import dateparser
 
 class RiaParser:
     def __init__(self, target_url: str, db_name: str) -> None:
+        self.__temp_path = './last_url.tmp'
         self._headers = {
             'User-Agent': r'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.188 Safari/537.36 CrKey/1.54.250320'
         }
@@ -15,14 +16,23 @@ class RiaParser:
         self._session = RiaParser.create_session(self._headers)
         self._db_name = db_name
         self.target_url = target_url
-        self.next_url = target_url
+        if os.path.exists(self.__temp_path):
+            with open(self.__temp_path, 'r') as f:
+                self.next_url = f.read()
+        else:
+            self.next_url = target_url
 
 
     def start_parsing(self):
         while True:
-            page = self.parse_page(self.next_url)
-            news_data = self.get_labels(page)
-            self.commit_to_db(news_data)
+            try:
+                page = self.parse_page(self.next_url)
+                news_data = self.get_labels(page)
+                self.commit_to_db(news_data)
+            except Exception:
+                print('Press F, retrying')
+                with open('last_url.tmp', 'w') as f:
+                    f.write(self.next_url)
 
     def parse_page(self, url: str) -> str:
         page = self._session.get(url)
